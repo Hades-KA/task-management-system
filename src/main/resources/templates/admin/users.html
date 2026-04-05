@@ -1,0 +1,78 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/app :: layout(~{::section}, 'Admin - Users', ~{::div[@id='bc']})}">
+
+<div id="bc">
+  <div class="page-pretitle text-muted">ADMIN</div>
+  <h2 class="page-title">Users</h2>
+</div>
+
+<section>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Danh sách tài khoản</h3>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-vcenter card-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Enabled</th>
+          <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="u : ${users}">
+          <td th:text="${u.id}">1</td>
+          <td th:text="${u.fullName}">Admin</td>
+          <td th:text="${u.email}">admin@gmail.com</td>
+
+          <td style="min-width: 160px;">
+            <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" class="d-flex gap-2">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+
+              <select class="form-select form-select-sm" name="role" onchange="this.form.submit()">
+                <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"
+                        th:selected="${u.role} == ${r}"></option>
+              </select>
+            </form>
+          </td>
+
+          <td>
+            <span class="badge bg-success" th:if="${u.enabled}">Enabled</span>
+            <span class="badge bg-secondary" th:if="${!u.enabled}">Disabled</span>
+          </td>
+
+          <td class="text-end">
+            <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post" class="d-inline">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+
+              <button th:if="${u.enabled}" class="btn btn-sm btn-outline-danger"
+                      type="submit" onclick="return confirm('Khóa tài khoản này?');">
+                Disable
+              </button>
+
+              <button th:if="${!u.enabled}" class="btn btn-sm btn-outline-success"
+                      type="submit" onclick="return confirm('Mở khóa tài khoản này?');">
+                Enable
+              </button>
+            </form>
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(users)}">
+          <td colspan="6" class="text-center text-muted">Chưa có user nào</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</html>

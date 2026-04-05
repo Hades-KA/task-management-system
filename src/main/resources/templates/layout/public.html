@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content, pageTitle)">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">QLCV</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+</head>
+<body class="bg-surface">
+
+<div th:replace="~{fragments/navbar_public :: navbar}"></div>
+
+<div class="page-wrapper">
+  <div class="page-body">
+    <div class="container-xl">
+      <div th:replace="${content}"></div>
+    </div>
+  </div>
+  <footer class="footer footer-transparent d-print-none mt-4">
+    <div class="container-xl">
+      <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+</body>
+</html>

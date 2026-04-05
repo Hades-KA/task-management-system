@@ -1,0 +1,171 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, 'Danh sách', null)}">
+
+<section>
+
+  <!-- Filter row -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="get" th:action="@{/ui/list}" class="d-flex flex-wrap align-items-center gap-2">
+        <span class="text-muted"><i class="ti ti-filter me-1"></i> Bộ lọc:</span>
+
+        <select class="form-select" name="projectId" style="width:180px;" onchange="this.form.submit()">
+          <option value="">Tất cả dự án</option>
+          <option th:each="p : ${projects}"
+                  th:value="${p.id}"
+                  th:text="${p.name}"
+                  th:selected="${selectedProjectId} == ${p.id}">
+          </option>
+        </select>
+
+        <select class="form-select" name="priority" style="width:150px;" onchange="this.form.submit()">
+          <option value="">Tất cả mức độ</option>
+          <option th:each="p : ${allPriorities}"
+                  th:value="${p}"
+                  th:text="${p.label}"
+                  th:selected="${selectedPriority} == ${p}">
+          </option>
+        </select>
+
+        <div class="input-icon" style="width:220px;">
+          <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+          <input class="form-control" name="q" placeholder="Tìm theo tiêu đề..."
+                 th:value="${q}">
+        </div>
+
+        <label class="form-check mb-0">
+          <input class="form-check-input" type="checkbox" name="overdue" value="true"
+                 th:checked="${overdue}" onchange="this.form.submit()">
+          <span class="form-check-label">Trễ hạn</span>
+        </label>
+
+        <button class="btn btn-outline-primary btn-sm" type="submit">
+          <i class="ti ti-filter me-1"></i> Lọc
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card mb-3">
+    <div class="card-body py-2">
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-sm"
+           th:classappend="${selectedStatus == null} ? 'btn-primary' : 'btn-outline-light'"
+           th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue})}">
+          Tất cả (<span th:text="${totalCount}">0</span>)
+        </a>
+        <a class="btn btn-sm"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'TODO'} ? 'btn-primary' : 'btn-outline-light'"
+           th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='TODO')}">
+          Cần làm (<span th:text="${todoCount}">0</span>)
+        </a>
+        <a class="btn btn-sm"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'IN_PROGRESS'} ? 'btn-primary' : 'btn-outline-light'"
+           th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='IN_PROGRESS')}">
+          Đang làm (<span th:text="${inProgressCount}">0</span>)
+        </a>
+        <a class="btn btn-sm"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'DONE'} ? 'btn-primary' : 'btn-outline-light'"
+           th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='DONE')}">
+          Hoàn thành (<span th:text="${doneCount}">0</span>)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-vcenter card-table table-hover">
+        <thead>
+        <tr>
+          <th style="width:100px">ID</th>
+          <th>Tiêu đề</th>
+          <th style="width:120px">Trạng thái</th>
+          <th style="width:110px">Mức độ</th>
+          <th style="width:120px">Hạn chót</th>
+          <th style="width:140px">Dự án</th>
+          <th style="width:80px" class="text-end">Sửa</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${tasks}">
+          <td class="text-muted" th:text="'TASK-' + ${t.id}">TASK-1</td>
+          <td>
+            <div class="fw-semibold" th:text="${t.title}">Title</div>
+            <div class="text-muted small" th:if="${t.description != null and !t.description.isBlank()}"
+                 th:text="${#strings.abbreviate(t.description, 60)}">Desc</div>
+          </td>
+          <td>
+            <span class="badge" th:classappend="${t.status.badgeClass}">
+              <i th:class="'me-1 ' + ${t.status.iconClass}"></i>
+              <span th:text="${t.status.label}">Status</span>
+            </span>
+          </td>
+          <td>
+            <span class="badge"
+                  th:classappend="${t.priority.name() == 'HIGH' ? 'bg-danger-lt text-danger' : (t.priority.name() == 'MEDIUM' ? 'bg-warning-lt text-warning' : 'bg-teal-lt text-teal')}"
+                  th:text="${t.priority.label}">Priority</span>
+          </td>
+          <td>
+            <span th:if="${t.dueDate != null}" th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+            <span th:if="${t.dueDate == null}" class="text-muted">-</span>
+            <span class="badge bg-danger ms-1"
+                  th:if="${t.dueDate != null and t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'}">
+              Trễ
+            </span>
+          </td>
+          <td>
+            <a th:href="@{/projects/{id}(id=${t.project.id})}"
+               th:text="${t.project.name}" class="text-reset">Project</a>
+          </td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary"
+               th:href="@{/tasks/{id}/edit(id=${t.id})}">
+              <i class="ti ti-edit"></i>
+            </a>
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(tasks)}">
+          <td colspan="7" class="text-center text-muted py-4">Không tìm thấy công việc nào</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phân trang -->
+    <div class="card-footer d-flex align-items-center justify-content-center gap-2"
+         th:if="${totalPages > 0}">
+
+      <a class="btn btn-sm btn-outline-light"
+         th:if="${currentPage > 1}"
+         th:href="@{/ui/list(page=${currentPage - 1},projectId=${selectedProjectId},status=${selectedStatus},priority=${selectedPriority},q=${q},overdue=${overdue})}">
+        <i class="ti ti-chevron-left"></i>
+      </a>
+      <button class="btn btn-sm btn-outline-light" th:if="${currentPage <= 1}" disabled>
+        <i class="ti ti-chevron-left"></i>
+      </button>
+
+      <span class="text-muted small">
+        Trang <span th:text="${currentPage}">1</span> / <span th:text="${totalPages}">1</span>
+        (<span th:text="${totalItems}">0</span> công việc)
+      </span>
+
+      <a class="btn btn-sm btn-outline-light"
+         th:if="${currentPage < totalPages}"
+         th:href="@{/ui/list(page=${currentPage + 1},projectId=${selectedProjectId},status=${selectedStatus},priority=${selectedPriority},q=${q},overdue=${overdue})}">
+        <i class="ti ti-chevron-right"></i>
+      </a>
+      <button class="btn btn-sm btn-outline-light" th:if="${currentPage >= totalPages}" disabled>
+        <i class="ti ti-chevron-right"></i>
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+</html>

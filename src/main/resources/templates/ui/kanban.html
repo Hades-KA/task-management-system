@@ -1,0 +1,270 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, 'Kanban', null)}">
+
+<section>
+
+  <!-- Filter row -->
+  <div class="card mb-3">
+    <div class="card-body kb-toolbar">
+      <div class="kb-toolbar-left">
+        <div class="kb-toolbar-label"><i class="ti ti-filter me-1"></i> Bộ lọc:</div>
+
+        <form method="get" th:action="@{/ui/kanban}" class="d-flex gap-2 flex-wrap" id="kanbanFilterForm">
+          <select class="form-select" name="projectId" style="width:180px;" onchange="this.form.submit()">
+            <option value="">Tất cả dự án</option>
+            <option th:each="p : ${projects}"
+                    th:value="${p.id}"
+                    th:text="${p.name}"
+                    th:selected="${selectedProjectId} == ${p.id}">
+            </option>
+          </select>
+
+          <select class="form-select" name="priority" style="width:150px;" onchange="this.form.submit()">
+            <option value="">Tất cả mức độ</option>
+            <option th:each="p : ${allPriorities}"
+                    th:value="${p}"
+                    th:text="${p.label}"
+                    th:selected="${selectedPriority} == ${p}">
+            </option>
+          </select>
+        </form>
+      </div>
+
+      <div class="kb-toolbar-right">
+        <a class="btn btn-primary" th:href="@{/projects}">
+          <i class="ti ti-plus me-1"></i> Tạo mới
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="kb-wrap">
+
+    <!-- CẦN LÀM -->
+    <div class="kb-col">
+      <div class="kb-col-head">
+        <div class="kb-col-title">
+          <i class="ti ti-circle" style="color:#94a3b8;"></i>
+          Cần làm <span class="kb-count" th:text="${#lists.size(todoTasks)}">0</span>
+        </div>
+      </div>
+      <div class="kb-list" id="col-todo" data-status="TODO">
+
+        <div th:each="t : ${todoTasks}"
+             class="kb-card"
+             th:classappend="${t.priority.name() == 'HIGH' ? ' pri-high' : (t.priority.name() == 'LOW' ? ' pri-low' : ' pri-med')}"
+             th:attr="data-id=${t.id}">
+          <div class="kb-card-top">
+            <div class="kb-code" th:text="'TASK-' + ${t.id}">TASK-1</div>
+            <div class="kb-pri"
+                 th:classappend="${t.priority.cssClass}"
+                 th:text="${t.priority.label}">TB</div>
+          </div>
+          <div class="kb-title" th:text="${t.title}">Title</div>
+          <div class="kb-tags">
+            <span class="kb-tag teal" th:text="${t.project.name}">Project</span>
+          </div>
+          <div class="kb-meta">
+            <div th:if="${t.dueDate != null}"
+                 th:classappend="${t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'} ? ' kb-overdue' : ''">
+              <i class="ti ti-calendar-event"></i>
+              <span th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+            </div>
+            <div th:if="${t.dueDate == null}" class="text-muted">Không có hạn</div>
+          </div>
+        </div>
+
+        <div class="kb-empty" th:if="${#lists.isEmpty(todoTasks)}">
+          Không có công việc
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ĐANG LÀM -->
+    <div class="kb-col">
+      <div class="kb-col-head">
+        <div class="kb-col-title">
+          <i class="ti ti-progress" style="color:#3b82f6;"></i>
+          Đang làm <span class="kb-count" th:text="${#lists.size(inProgressTasks)}">0</span>
+        </div>
+      </div>
+      <div class="kb-list" id="col-progress" data-status="IN_PROGRESS">
+
+        <div th:each="t : ${inProgressTasks}"
+             class="kb-card"
+             th:classappend="${t.priority.name() == 'HIGH' ? ' pri-high' : (t.priority.name() == 'LOW' ? ' pri-low' : ' pri-med')}"
+             th:attr="data-id=${t.id}">
+          <div class="kb-card-top">
+            <div class="kb-code" th:text="'TASK-' + ${t.id}">TASK-1</div>
+            <div class="kb-pri"
+                 th:classappend="${t.priority.cssClass}"
+                 th:text="${t.priority.label}">TB</div>
+          </div>
+          <div class="kb-title" th:text="${t.title}">Title</div>
+          <div class="kb-tags">
+            <span class="kb-tag blue" th:text="${t.project.name}">Project</span>
+          </div>
+          <div class="kb-meta">
+            <div th:if="${t.dueDate != null}"
+                 th:classappend="${t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'} ? ' kb-overdue' : ''">
+              <i class="ti ti-calendar-event"></i>
+              <span th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+            </div>
+            <div th:if="${t.dueDate == null}" class="text-muted">Không có hạn</div>
+          </div>
+        </div>
+
+        <div class="kb-empty" th:if="${#lists.isEmpty(inProgressTasks)}">
+          Không có công việc
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HOÀN THÀNH -->
+    <div class="kb-col">
+      <div class="kb-col-head">
+        <div class="kb-col-title">
+          <i class="ti ti-circle-check" style="color:#22c55e;"></i>
+          Hoàn thành <span class="kb-count" th:text="${#lists.size(doneTasks)}">0</span>
+        </div>
+      </div>
+      <div class="kb-list" id="col-done" data-status="DONE">
+
+        <div th:each="t : ${doneTasks}"
+             class="kb-card"
+             th:classappend="${t.priority.name() == 'HIGH' ? ' pri-high' : (t.priority.name() == 'LOW' ? ' pri-low' : ' pri-med')}"
+             th:attr="data-id=${t.id}">
+          <div class="kb-card-top">
+            <div class="kb-code" th:text="'TASK-' + ${t.id}">TASK-1</div>
+            <div class="kb-pri"
+                 th:classappend="${t.priority.cssClass}"
+                 th:text="${t.priority.label}">TB</div>
+          </div>
+          <div class="kb-title" th:text="${t.title}">Title</div>
+          <div class="kb-tags">
+            <span class="kb-tag teal" th:text="${t.project.name}">Project</span>
+          </div>
+          <div class="kb-meta">
+            <div th:if="${t.dueDate != null}">
+              <i class="ti ti-calendar-event"></i>
+              <span th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+            </div>
+            <div th:if="${t.dueDate == null}" class="text-muted">Không có hạn</div>
+          </div>
+        </div>
+
+        <div class="kb-empty" th:if="${#lists.isEmpty(doneTasks)}">
+          Không có công việc
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal chi tiết -->
+  <div class="modal modal-blur fade" id="taskDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="background:#0d2438; color:rgba(255,255,255,.9); border:1px solid rgba(255,255,255,.08);">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.08);">
+          <div>
+            <div class="text-muted small" id="mdTaskCode">TASK-000</div>
+            <h3 class="modal-title mb-0" id="mdTaskTitle">Tên công việc</h3>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="text-muted small">Mức độ ưu tiên</div>
+              <div id="mdTaskPriority" class="fw-bold">Cao</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-muted small">Trạng thái</div>
+              <div id="mdTaskStatus" class="fw-bold">Cần làm</div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-muted small">Deadline</div>
+              <div id="mdTaskDue" class="fw-bold">-</div>
+            </div>
+            <div class="col-md-6">
+              <div class="text-muted small">Dự án</div>
+              <div id="mdTaskProject" class="fw-bold">Project</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.08);">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SortableJS + Drag & Drop lưu DB -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+  <!-- CSRF meta -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    document.querySelectorAll('.kb-list').forEach(list => {
+      new Sortable(list, {
+        group: 'kanban',
+        animation: 150,
+        ghostClass: 'kb-ghost',
+        chosenClass: 'kb-chosen',
+        onEnd: function(evt) {
+          const card = evt.item;
+          const taskId = card.getAttribute('data-id');
+          const newStatus = evt.to.getAttribute('data-status');
+
+          if (!taskId || !newStatus) return;
+
+          fetch('/ui/kanban/tasks/' + taskId + '/move?status=' + newStatus, {
+            method: 'POST',
+            headers: { [csrfHeader]: csrfToken }
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              // Cập nhật count
+              document.querySelectorAll('.kb-col').forEach(col => {
+                const count = col.querySelector('.kb-list').querySelectorAll('.kb-card').length;
+                col.querySelector('.kb-count').textContent = count;
+              });
+            }
+          })
+          .catch(err => console.error('Lỗi:', err));
+        }
+      });
+    });
+
+    // Click card => modal
+    document.addEventListener('click', function(e) {
+      const card = e.target.closest('.kb-card');
+      if (!card) return;
+
+      document.getElementById('mdTaskCode').innerText = card.querySelector('.kb-code')?.innerText || '';
+      document.getElementById('mdTaskTitle').innerText = card.querySelector('.kb-title')?.innerText || '';
+      document.getElementById('mdTaskPriority').innerText = card.querySelector('.kb-pri')?.innerText || '';
+      document.getElementById('mdTaskStatus').innerText =
+        card.closest('.kb-col')?.querySelector('.kb-col-title')?.innerText?.replace(/\d+/g, '').trim() || '';
+      document.getElementById('mdTaskDue').innerText =
+        card.querySelector('.kb-meta span')?.innerText || 'Không có hạn';
+      document.getElementById('mdTaskProject').innerText =
+        card.querySelector('.kb-tag')?.innerText || '';
+
+      new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
+    });
+  </script>
+
+</section>
+</html>

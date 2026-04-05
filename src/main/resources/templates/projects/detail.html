@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, ${project.name}, ~{::div[@id='bc']})}">
+
+<div id="bc">
+  <div class="page-pretitle text-muted">DỰ ÁN</div>
+  <h2 class="page-title" th:text="${project.name}">Project</h2>
+</div>
+
+<section>
+
+  <!-- Header -->
+  <div class="row mb-3">
+    <div class="col-12 col-lg-8">
+      <div class="text-muted"
+           th:if="${project.description != null and !project.description.isBlank()}"
+           th:text="${project.description}">Mô tả</div>
+      <div class="mt-1">
+        <span class="text-muted small">Chủ sở hữu:</span>
+        <span class="fw-semibold" th:text="${project.owner.fullName}">Admin</span>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4 d-flex justify-content-lg-end gap-2 mt-2 mt-lg-0 align-items-start">
+      <a class="btn btn-outline-secondary" th:href="@{/projects}">
+        <i class="ti ti-arrow-left" style="font-size:16px;"></i> Projects
+      </a>
+      <a class="btn btn-primary" th:href="@{/projects/{id}/tasks/new(id=${project.id})}">
+        <i class="ti ti-plus" style="font-size:16px;"></i> Tạo công việc
+      </a>
+    </div>
+  </div>
+
+  <!-- Thành viên dự án -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h3 class="card-title">Thành viên dự án</h3>
+    </div>
+    <div class="card-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+
+        <!-- Owner -->
+        <span class="badge"
+              style="background:rgba(31,209,185,.12); color:#1fd1b9; border:1px solid rgba(31,209,185,.25); padding:6px 12px; font-size:13px;">
+          <i class="ti ti-crown" style="font-size:14px;"></i>
+          <span th:text="${project.owner.fullName}">Admin</span>
+          <span class="text-muted small">(Owner)</span>
+        </span>
+
+        <!-- Members -->
+        <span class="badge"
+              th:each="m : ${project.members}"
+              style="background:rgba(59,130,246,.12); color:#60a5fa; border:1px solid rgba(59,130,246,.25); padding:6px 12px; font-size:13px;">
+          <i class="ti ti-user" style="font-size:14px;"></i>
+          <span th:text="${m.fullName}">Member</span>
+
+          <form th:action="@{/projects/{id}/members/{mid}/remove(id=${project.id}, mid=${m.id})}"
+                method="post"
+                class="d-inline ms-1"
+                th:if="${#authentication.name == project.owner.email}"
+                onsubmit="return confirm('Xóa thành viên này?');">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn-close btn-close-white" style="font-size:8px; opacity:.6;"></button>
+          </form>
+        </span>
+      </div>
+
+      <!-- Form thêm member -->
+      <form th:if="${#authentication.name == project.owner.email}"
+            th:action="@{/projects/{id}/members/add(id=${project.id})}"
+            method="post"
+            class="d-flex gap-2"
+            style="max-width:420px;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="email" class="form-control" name="memberEmail"
+               placeholder="Email thành viên mới..." required>
+        <button class="btn btn-primary" type="submit" style="white-space:nowrap;">
+          <i class="ti ti-user-plus" style="font-size:16px;"></i> Thêm
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <form class="card mb-3" method="get" th:action="@{/projects/{id}(id=${project.id})}">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Tìm kiếm</label>
+          <input class="form-control" name="q" placeholder="Tìm theo tiêu đề..." th:value="${q}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Trạng thái</label>
+          <select class="form-select" name="status">
+            <option value="">Tất cả</option>
+            <option th:each="s : ${allStatuses}"
+                    th:value="${s}"
+                    th:text="${s.label}"
+                    th:selected="${status} == ${s}">
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Ưu tiên</label>
+          <select class="form-select" name="priority">
+            <option value="">Tất cả</option>
+            <option th:each="p : ${allPriorities}"
+                    th:value="${p}"
+                    th:text="${p.label}"
+                    th:selected="${priority} == ${p}">
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small text-muted">Loại</label>
+          <select class="form-select" name="taskType">
+            <option value="">Tất cả</option>
+            <option th:each="t : ${allTaskTypes}"
+                    th:value="${t}"
+                    th:text="${t.label}"
+                    th:selected="${taskType} == ${t}">
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-1 d-flex align-items-center" style="padding-top:24px;">
+          <label class="form-check mb-0 d-flex align-items-center gap-2">
+            <input class="form-check-input" type="checkbox" name="overdue" value="true" th:checked="${overdue}">
+            <span class="form-check-label">Trễ hạn</span>
+          </label>
+        </div>
+
+        <div class="col-md-2" style="padding-top:24px;">
+          <button class="btn btn-outline-primary w-100" type="submit">
+            <i class="ti ti-filter" style="font-size:16px;"></i> Lọc
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Tasks table -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Danh sách công việc</h3>
+    </div>
+
+    <div class="table-responsive project-task-table-wrap">
+      <table class="table table-vcenter card-table table-hover project-task-table">
+        <thead>
+        <tr>
+          <th class="col-title">Tiêu đề</th>
+          <th class="col-desc">Mô tả</th>
+          <th class="col-type text-center">Loại</th>
+          <th class="col-reporter">Người tạo</th>
+          <th class="col-assignee">Phụ trách</th>
+          <th class="col-priority text-center">Ưu tiên</th>
+          <th class="col-deadline text-center">Deadline</th>
+          <th class="col-status text-center">Trạng thái</th>
+          <th class="col-action text-center">Thao tác</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="t : ${tasks}">
+
+          <!-- Tiêu đề -->
+          <td class="col-title">
+            <div class="fw-semibold task-title-cell" th:text="${t.title}">Title</div>
+          </td>
+
+          <!-- Mô tả -->
+          <td class="col-desc">
+            <div class="text-muted small task-desc-cell"
+                 th:if="${t.description != null and !t.description.isBlank()}"
+                 th:text="${#strings.abbreviate(t.description, 55)}">Mô tả</div>
+            <span th:if="${t.description == null or t.description.isBlank()}" class="text-muted small">—</span>
+          </td>
+
+          <!-- Loại -->
+          <td class="col-type text-center">
+            <span class="badge"
+                  th:style="'background:' + ${t.taskType.color} + '22; color:' + ${t.taskType.color} + '; border:1px solid ' + ${t.taskType.color} + '44; font-size:11px;'"
+                  th:text="${t.taskType.label}">Task</span>
+          </td>
+
+          <!-- Người tạo -->
+          <td class="col-reporter">
+            <span th:if="${t.reporter != null}" th:text="${t.reporter.fullName}" class="small">Reporter</span>
+            <span th:if="${t.reporter == null}" class="text-muted small">—</span>
+          </td>
+
+          <!-- Phụ trách -->
+          <td class="col-assignee">
+            <span th:if="${t.assignee != null}" th:text="${t.assignee.fullName}" class="small">Assignee</span>
+            <span th:if="${t.assignee == null}" class="text-muted small">Chưa giao</span>
+          </td>
+
+          <!-- Ưu tiên -->
+          <td class="col-priority text-center">
+            <span class="dash-priority"
+                  th:classappend="${t.priority.cssClass}"
+                  th:text="${t.priority.label}">Med</span>
+          </td>
+
+          <!-- Deadline -->
+          <td class="col-deadline text-center">
+            <div th:if="${t.dueDate != null}"
+                 th:style="${t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'} ? 'color:#fb7185; font-weight:700;' : ''">
+              <div th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</div>
+              <span th:if="${t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'}"
+                    class="badge bg-danger mt-1"
+                    style="font-size:9px;">Trễ</span>
+            </div>
+            <span th:if="${t.dueDate == null}" class="text-muted small">—</span>
+          </td>
+
+          <!-- Trạng thái -->
+          <td class="col-status text-center">
+            <form th:action="@{/tasks/{id}/status(id=${t.id})}" method="post" class="d-inline-block">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <input type="hidden" name="projectId" th:value="${project.id}">
+              <select class="form-select form-select-sm project-status-select" name="value" onchange="this.form.submit()">
+                <option th:each="s : ${allStatuses}"
+                        th:value="${s}"
+                        th:text="${s.label}"
+                        th:selected="${t.status} == ${s}">
+                </option>
+              </select>
+            </form>
+          </td>
+
+          <!-- Thao tác -->
+          <td class="col-action text-center">
+            <div class="task-actions-wrap">
+              <a class="btn btn-sm btn-outline-primary task-icon-btn"
+                 th:href="@{/tasks/{id}/edit(id=${t.id})}">
+                <i class="ti ti-edit" style="font-size:14px;"></i>
+              </a>
+
+              <form th:action="@{/tasks/{id}/delete(id=${t.id})}"
+                    method="post"
+                    class="d-inline"
+                    onsubmit="return confirm('Xóa công việc này?');">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="projectId" th:value="${project.id}">
+                <button class="btn btn-sm btn-outline-danger task-icon-btn" type="submit">
+                  <i class="ti ti-trash" style="font-size:14px;"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(tasks)}">
+          <td colspan="9" class="text-center text-muted py-4">Chưa có công việc nào</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, 'Lịch sử', ~{::div[@id='bc']})}">
+
+<div id="bc">
+  <div class="page-pretitle text-muted">NHẬT KÝ</div>
+  <h2 class="page-title">Lịch sử hoạt động</h2>
+</div>
+
+<section>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">50 hoạt động gần nhất</h3>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="list-group list-group-flush">
+
+        <div class="list-group-item" th:each="log : ${logs}"
+             style="background:transparent; border-bottom:1px solid rgba(255,255,255,.06); padding:16px;">
+          <div class="d-flex align-items-start gap-3">
+
+            <div style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); flex-shrink:0;"
+                 th:style="'color:' + ${log.actionColor}">
+              <i th:class="${log.actionIcon}" style="font-size:16px;"></i>
+            </div>
+
+            <div class="flex-fill">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <span class="badge me-1"
+                        th:style="'background:' + ${log.actionColor} + '22; color:' + ${log.actionColor} + '; border:1px solid ' + ${log.actionColor} + '44;'"
+                        th:text="${log.actionLabel}">Action</span>
+                  <span class="badge bg-secondary-lt" th:text="${log.entityType}">TASK</span>
+                </div>
+                <small class="text-muted"
+                       th:text="${#temporals.format(log.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</small>
+              </div>
+
+              <div class="fw-semibold mt-1" th:text="${log.entityTitle}">Title</div>
+              <div class="text-muted small" th:if="${log.detail != null}" th:text="${log.detail}">Detail</div>
+              <div class="text-muted small mt-1">
+                Bởi: <span th:text="${log.user.fullName}">Admin</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="list-group-item text-center text-muted py-4"
+             th:if="${logs == null or #lists.isEmpty(logs)}"
+             style="background:transparent;">
+          Chưa có hoạt động nào
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+</html>

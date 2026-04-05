@@ -1,0 +1,183 @@
+/* =========================
+   CALENDAR VIEW
+   ========================= */
+
+.cal-toolbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cal-tabs{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cal-tab{
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cal-tab.active{
+  background: rgba(31,209,185,.14);
+  color: #1fd1b9;
+  border-color: rgba(31,209,185,.25);
+}
+
+.cal-month-nav{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cal-month-btn{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,255,255,.80);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.cal-month-title{
+  font-size: 22px;
+  font-weight: 800;
+  color: rgba(255,255,255,.92);
+}
+
+.cal-weekdays{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 16px;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.cal-weekday{
+  text-align: center;
+  color: rgba(255,255,255,.60);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 0;
+}
+
+.cal-grid{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.cal-cell{
+  min-height: 130px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 14px;
+  padding: 8px;
+  position: relative;
+  transition: .15s ease;
+}
+
+.cal-cell:hover{
+  border-color: rgba(31,209,185,.20);
+}
+
+.cal-cell-out{
+  opacity: .35;
+}
+
+.cal-cell-today{
+  border-color: rgba(31,209,185,.40);
+  box-shadow: 0 0 0 1px rgba(31,209,185,.20) inset;
+}
+
+.cal-day-top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cal-day-number{
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255,255,255,.85);
+}
+
+.cal-add{
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.65);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.cal-task{
+  display: block;
+  padding: 5px 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  line-height: 1.35;
+  text-decoration: none;
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cal-task.todo{
+  border-left: 3px solid #94a3b8;
+}
+
+.cal-task.in-progress{
+  border-left: 3px solid #3b82f6;
+}
+
+.cal-task.done{
+  border-left: 3px solid #22c55e;
+}
+
+.cal-task:hover{
+  background: rgba(255,255,255,.06);
+}
+
+.cal-more{
+  font-size: 11px;
+  color: rgba(255,255,255,.45);
+  padding-top: 2px;
+}
+
+@media (max-width: 992px){
+  .cal-grid,
+  .cal-weekdays{
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px){
+  .cal-grid,
+  .cal-weekdays{
+    grid-template-columns: 1fr;
+  }
+}

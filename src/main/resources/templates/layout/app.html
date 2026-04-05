@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(content, pageTitle, breadcrumbs)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title th:text="${pageTitle}">QLCV</title>
+
+  <!-- Tabler UI -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler.min.css">
+
+  <!-- Tabler Icons - THỬ NHIỀU LINK -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" th:href="@{/css/dark-dashboard.css}">
+  <link rel="stylesheet" th:href="@{/css/kanban.css}">
+  <link rel="stylesheet" th:href="@{/css/calendar.css}">
+
+  <style>
+    .page.sidebar-collapsed aside.navbar-vertical {
+      width: 0 !important;
+      min-width: 0 !important;
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+    }
+    .page.sidebar-collapsed .page-wrapper {
+      margin-left: 0 !important;
+    }
+    aside.navbar-vertical {
+      transition: width .25s ease, min-width .25s ease;
+    }
+    .page-wrapper {
+      transition: margin-left .25s ease;
+    }
+  </style>
+</head>
+
+<body class="layout-fluid dark-dashboard">
+
+<!-- Topbar -->
+<div th:replace="~{fragments/navbar_app :: navbar}"></div>
+
+<div class="page" id="pageRoot">
+  <!-- Sidebar -->
+  <aside class="navbar navbar-vertical navbar-expand-lg">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+  </aside>
+
+  <!-- Main -->
+  <div class="page-wrapper">
+
+    <!-- Breadcrumbs -->
+    <div class="page-header d-print-none" th:if="${breadcrumbs != null}">
+      <div class="container-xl">
+        <div th:replace="${breadcrumbs}"></div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="container-xl">
+        <div th:replace="${content}"></div>
+      </div>
+    </div>
+
+    <footer class="footer d-print-none">
+      <div class="container-xl">
+        <div th:replace="~{fragments/footer :: footer}"></div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- Sidebar toggle script -->
+<script>
+  (function() {
+    const KEY = 'sidebar-collapsed';
+    const page = document.getElementById('pageRoot');
+
+    // Restore state
+    if (localStorage.getItem(KEY) === 'true') {
+      page.classList.add('sidebar-collapsed');
+    }
+
+    // Toggle function (gọi từ navbar)
+    window.toggleSidebar = function() {
+      page.classList.toggle('sidebar-collapsed');
+      localStorage.setItem(KEY, page.classList.contains('sidebar-collapsed'));
+    };
+  })();
+</script>
+
+</body>
+</html>

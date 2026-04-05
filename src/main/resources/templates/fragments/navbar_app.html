@@ -1,0 +1,62 @@
+<header class="navbar navbar-expand-md d-print-none" th:fragment="navbar"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <div class="container-xl">
+
+    <!-- Toggle sidebar button -->
+    <button class="navbar-toggler border-0 me-2" type="button" onclick="toggleSidebar()" title="Ẩn/hiện sidebar">
+      <i class="ti ti-layout-sidebar-left-collapse" style="font-size:20px;"></i>
+    </button>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <a class="navbar-brand" th:href="@{/dashboard}">
+      <span class="fw-bold" style="color:#1fd1b9;">Quản lý Task</span>
+      <span class="text-muted small ms-1">(v2.0)</span>
+    </a>
+
+    <div class="navbar-nav flex-row order-md-last ms-auto align-items-center gap-2">
+
+      <!-- Search -->
+      <div class="nav-item d-none d-md-block">
+        <form method="get" th:action="@{/ui/list}" class="input-icon">
+          <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+          <input class="form-control" name="q" placeholder="Tìm kiếm công việc..." style="min-width: 260px;">
+        </form>
+      </div>
+
+      <!-- Create button -->
+      <a class="btn btn-primary" th:href="@{/projects/new}">
+        <i class="ti ti-plus me-1"></i> Tạo Mới
+      </a>
+
+      <!-- User dropdown -->
+      <div class="dropdown">
+        <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown">
+          <span class="avatar avatar-sm" style="background:rgba(31,209,185,.15); color:#1fd1b9;">
+            <i class="ti ti-user"></i>
+          </span>
+          <div class="d-none d-xl-block ps-2">
+            <div class="fw-semibold" sec:authentication="name">admin@gmail.com</div>
+            <div class="small text-muted" sec:authorize="hasRole('ADMIN')">ADMIN</div>
+            <div class="small text-muted" sec:authorize="!hasRole('ADMIN')">USER</div>
+          </div>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+          <a class="dropdown-item" th:href="@{/dashboard}"><i class="ti ti-layout-dashboard me-2"></i>Dashboard</a>
+          <a class="dropdown-item" th:href="@{/projects}"><i class="ti ti-folder me-2"></i>Projects</a>
+          <div class="dropdown-divider"></div>
+          <form th:action="@{/logout}" method="post" class="px-2">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button class="btn btn-outline-light w-100" type="submit">
+              <i class="ti ti-logout me-2"></i>Đăng xuất
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

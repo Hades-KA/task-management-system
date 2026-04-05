@@ -1,0 +1,191 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, 'Lịch trình', null)}">
+
+<section>
+
+  <!-- Filter row -->
+  <div class="card mb-3">
+    <div class="card-body cal-toolbar">
+
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="text-muted"><i class="ti ti-filter me-1"></i> Bộ lọc:</span>
+
+        <form method="get" th:action="@{/ui/calendar}" class="d-flex gap-2 flex-wrap">
+          <input type="hidden" name="year" th:value="${year}">
+          <input type="hidden" name="month" th:value="${month}">
+          <input type="hidden" name="status" th:value="${selectedStatus}">
+
+          <select class="form-select" name="projectId" style="width: 200px;" onchange="this.form.submit()">
+            <option value="">Tất cả dự án</option>
+            <option th:each="p : ${projects}"
+                    th:value="${p.id}"
+                    th:text="${p.name}"
+                    th:selected="${selectedProjectId} == ${p.id}">
+            </option>
+          </select>
+        </form>
+      </div>
+
+      <div class="cal-tabs">
+        <a class="cal-tab"
+           th:classappend="${selectedStatus == null} ? ' active' : ''"
+           th:href="@{/ui/calendar(year=${year},month=${month},projectId=${selectedProjectId})}">
+          Tất cả (<span th:text="${totalCount}">0</span>)
+        </a>
+
+        <a class="cal-tab"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'TODO'} ? ' active' : ''"
+           th:href="@{/ui/calendar(year=${year},month=${month},projectId=${selectedProjectId},status='TODO')}">
+          Cần làm (<span th:text="${todoCount}">0</span>)
+        </a>
+
+        <a class="cal-tab"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'IN_PROGRESS'} ? ' active' : ''"
+           th:href="@{/ui/calendar(year=${year},month=${month},projectId=${selectedProjectId},status='IN_PROGRESS')}">
+          Đang làm (<span th:text="${inProgressCount}">0</span>)
+        </a>
+
+        <a class="cal-tab"
+           th:classappend="${selectedStatus != null and selectedStatus.name() == 'DONE'} ? ' active' : ''"
+           th:href="@{/ui/calendar(year=${year},month=${month},projectId=${selectedProjectId},status='DONE')}">
+          Hoàn thành (<span th:text="${doneCount}">0</span>)
+        </a>
+      </div>
+
+      <div class="cal-month-nav">
+        <a class="cal-month-btn"
+           th:href="@{/ui/calendar(year=${prevYear},month=${prevMonth},projectId=${selectedProjectId},status=${selectedStatus})}">
+          <i class="ti ti-chevron-left"></i>
+        </a>
+
+        <div class="cal-month-title" th:text="${monthLabel}">Tháng 1 2026</div>
+
+        <a class="cal-month-btn"
+           th:href="@{/ui/calendar(year=${nextYear},month=${nextMonth},projectId=${selectedProjectId},status=${selectedStatus})}">
+          <i class="ti ti-chevron-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekdays -->
+  <div class="cal-weekdays">
+    <div class="cal-weekday">CN</div>
+    <div class="cal-weekday">T2</div>
+    <div class="cal-weekday">T3</div>
+    <div class="cal-weekday">T4</div>
+    <div class="cal-weekday">T5</div>
+    <div class="cal-weekday">T6</div>
+    <div class="cal-weekday">T7</div>
+  </div>
+
+  <!-- Calendar grid -->
+  <div class="cal-grid">
+    <div class="cal-cell"
+         th:each="day : ${calendarDays}"
+         th:classappend="${(!day.currentMonth ? ' cal-cell-out' : '') + (day.today ? ' cal-cell-today' : '')}">
+
+      <div class="cal-day-top">
+        <div class="cal-day-number" th:text="${day.date.dayOfMonth}">1</div>
+        <a class="cal-add" href="#" onclick="return false;">
+          <i class="ti ti-plus"></i>
+        </a>
+      </div>
+
+      <div th:each="t, stat : ${day.tasks}">
+        <a href="#"
+           th:if="${stat.index < 3}"
+           class="cal-task"
+           th:classappend="${#strings.toLowerCase(#strings.replace(t.status.name(), '_', '-'))}"
+           th:attr="data-id=${t.id},
+                    data-title=${t.title},
+                    data-status=${t.status.label},
+                    data-priority=${t.priority.label},
+                    data-due=${t.dueDate},
+                    data-project=${t.project.name},
+                    data-desc=${t.description}"
+           onclick="return false;">
+          <span th:text="${t.title}">Task</span>
+        </a>
+      </div>
+
+      <div class="cal-more" th:if="${#lists.size(day.tasks) > 3}">
+        +<span th:text="${#lists.size(day.tasks) - 3}">0</span> việc khác
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal chi tiết task -->
+  <div class="modal modal-blur fade" id="calendarTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content"
+           style="background:#0d2438; color:rgba(255,255,255,.9); border:1px solid rgba(255,255,255,.08);">
+        <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,.08);">
+          <div>
+            <div class="text-muted small" id="mdCalTaskCode">TASK</div>
+            <h3 class="modal-title mb-0" id="mdCalTaskTitle">Tên công việc</h3>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="text-muted small">Trạng thái</div>
+              <div id="mdCalTaskStatus" class="fw-bold">Cần làm</div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="text-muted small">Mức độ</div>
+              <div id="mdCalTaskPriority" class="fw-bold">Cao</div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="text-muted small">Hạn chót</div>
+              <div id="mdCalTaskDue" class="fw-bold">2026-01-01</div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="text-muted small">Dự án</div>
+              <div id="mdCalTaskProject" class="fw-bold">Project</div>
+            </div>
+
+            <div class="col-12">
+              <div class="text-muted small mb-1">Mô tả</div>
+              <div class="card p-3"
+                   style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);"
+                   id="mdCalTaskDesc">
+                Không có mô tả
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.08);">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS mở modal -->
+  <script>
+    document.querySelectorAll('.cal-task').forEach(item => {
+      item.addEventListener('click', function () {
+        document.getElementById('mdCalTaskCode').innerText = 'TASK-' + (this.dataset.id || '');
+        document.getElementById('mdCalTaskTitle').innerText = this.dataset.title || '';
+        document.getElementById('mdCalTaskStatus').innerText = this.dataset.status || '';
+        document.getElementById('mdCalTaskPriority').innerText = this.dataset.priority || '';
+        document.getElementById('mdCalTaskDue').innerText = this.dataset.due || '';
+        document.getElementById('mdCalTaskProject').innerText = this.dataset.project || '';
+        document.getElementById('mdCalTaskDesc').innerText = this.dataset.desc || 'Không có mô tả';
+
+        new bootstrap.Modal(document.getElementById('calendarTaskModal')).show();
+      });
+    });
+  </script>
+
+</section>
+</html>

@@ -1,0 +1,321 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/app :: layout(~{::section}, 'Thống kê', null)}">
+
+<section>
+
+  <!-- HERO -->
+  <div class="card dash-hero mb-3">
+    <div class="card-body p-4">
+      <div class="dash-kicker">
+        <i class="ti ti-sparkles" style="font-size:14px; color:inherit;"></i>
+        Tổng quan hệ thống
+      </div>
+
+      <h2 class="dash-hero-title mb-2">Thống kê công việc</h2>
+
+      <p class="dash-hero-subtitle mb-0">
+        Theo dõi tiến độ công việc, số lượng task ưu tiên cao, tình trạng hoàn thành
+        và các cập nhật gần đây trong hệ thống quản lý của bạn.
+      </p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3 mb-3">
+
+    <!-- Tổng công việc -->
+    <div class="col">
+      <div class="card dash-card h-100">
+        <div class="card-body">
+          <div class="dash-card-top">
+            <div class="dash-card-icon teal">
+              <i class="ti ti-list-check" style="font-size:22px; color:#1fd1b9;"></i>
+            </div>
+            <div class="dash-card-meta">
+              <div class="dash-card-label">Tổng công việc</div>
+              <div class="dash-card-value" th:text="${tasksCount}">0</div>
+            </div>
+          </div>
+          <div class="dash-card-sub">Tổng số task trong tất cả project</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cần làm -->
+    <div class="col">
+      <div class="card dash-card h-100">
+        <div class="card-body">
+          <div class="dash-card-top">
+            <div class="dash-card-icon gray">
+              <i class="ti ti-circle-dashed" style="font-size:22px; color:#94a3b8;"></i>
+            </div>
+            <div class="dash-card-meta">
+              <div class="dash-card-label">Cần làm</div>
+              <div class="dash-card-value" th:text="${todoCount}">0</div>
+            </div>
+          </div>
+          <div class="dash-card-sub">Các task chưa bắt đầu xử lý</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Đang làm -->
+    <div class="col">
+      <div class="card dash-card h-100">
+        <div class="card-body">
+          <div class="dash-card-top">
+            <div class="dash-card-icon blue">
+              <i class="ti ti-loader" style="font-size:22px; color:#60a5fa;"></i>
+            </div>
+            <div class="dash-card-meta">
+              <div class="dash-card-label">Đang làm</div>
+              <div class="dash-card-value" th:text="${inProgressCount}">0</div>
+            </div>
+          </div>
+          <div class="dash-card-sub">Những task đang trong tiến trình</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ưu tiên cao -->
+    <div class="col">
+      <div class="card dash-card h-100">
+        <div class="card-body">
+          <div class="dash-card-top">
+            <div class="dash-card-icon red">
+              <i class="ti ti-urgent" style="font-size:22px; color:#fb7185;"></i>
+            </div>
+            <div class="dash-card-meta">
+              <div class="dash-card-label">Ưu tiên cao</div>
+              <div class="dash-card-value" th:text="${highCount}">0</div>
+            </div>
+          </div>
+          <div class="dash-card-sub">Các task cần được xử lý sớm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tỷ lệ hoàn thành -->
+    <div class="col">
+      <div class="card dash-card h-100">
+        <div class="card-body">
+          <div class="dash-card-top">
+            <div class="dash-card-icon green">
+              <i class="ti ti-circle-check" style="font-size:22px; color:#22c55e;"></i>
+            </div>
+            <div class="dash-card-meta">
+              <div class="dash-card-label">Tỷ lệ hoàn thành</div>
+              <div class="dash-card-value">
+                <span th:text="${completionRate}">0</span>%
+              </div>
+            </div>
+          </div>
+          <div class="dash-card-sub">Tính theo số task đã hoàn thành</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS -->
+  <div class="row g-3 mb-3">
+
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <h3 class="card-title" style="display:flex; align-items:center; gap:10px;">
+            <i class="ti ti-chart-donut" style="font-size:20px; color:#1fd1b9;"></i>
+            Trạng thái công việc
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="dash-chart-box">
+            <canvas id="chartStatus"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header">
+          <h3 class="card-title" style="display:flex; align-items:center; gap:10px;">
+            <i class="ti ti-chart-bar" style="font-size:20px; color:#1fd1b9;"></i>
+            Mức độ ưu tiên
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="dash-chart-box">
+            <canvas id="chartPriority"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RECENT TASKS -->
+  <div class="card">
+    <div class="card-header">
+      <div class="dash-table-head">
+        <h3 class="card-title" style="display:flex; align-items:center; gap:10px;">
+          <i class="ti ti-clock-hour-4" style="font-size:20px; color:#1fd1b9;"></i>
+          Công việc gần đây
+        </h3>
+
+        <a th:href="@{/ui/list}" class="btn btn-sm btn-outline-light">
+          Xem tất cả <i class="ti ti-arrow-right" style="font-size:14px;"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-vcenter card-table table-hover">
+        <thead>
+        <tr>
+          <th>Tiêu đề</th>
+          <th style="width: 190px;">Dự án</th>
+          <th style="width: 150px;">Trạng thái</th>
+          <th style="width: 130px;">Ưu tiên</th>
+          <th style="width: 140px;">Deadline</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="t : ${recentTasks}">
+          <td>
+            <div class="fw-semibold" style="color:rgba(255,255,255,.92);" th:text="${t.title}">Task title</div>
+            <div class="text-muted small"
+                 th:if="${t.description != null and !t.description.isBlank()}"
+                 th:text="${t.description}">
+              Mô tả task
+            </div>
+          </td>
+
+          <td>
+            <a th:href="@{/projects/{id}(id=${t.project.id})}"
+               style="color:rgba(255,255,255,.85); text-decoration:none;">
+              <i class="ti ti-folder" style="font-size:14px; color:#1fd1b9; margin-right:4px;"></i>
+              <span th:text="${t.project.name}">Project</span>
+            </a>
+          </td>
+
+          <td>
+            <span class="badge" th:classappend="${t.status.badgeClass}">
+              <i th:class="'me-1 ' + ${t.status.iconClass}" style="font-size:13px;"></i>
+              <span th:text="${t.status.label}">Status</span>
+            </span>
+          </td>
+
+          <td>
+            <span class="dash-priority"
+                  th:classappend="${t.priority.cssClass}"
+                  th:text="${t.priority.label}">
+              Trung bình
+            </span>
+          </td>
+
+          <td>
+            <div style="display:flex; align-items:center; gap:6px;"
+                 th:style="${(t.dueDate != null and t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE') ? 'color:#fb7185; font-weight:700; display:flex; align-items:center; gap:6px;' : 'color:rgba(255,255,255,.78); display:flex; align-items:center; gap:6px;'}">
+              <i class="ti ti-calendar-event" style="font-size:14px;"></i>
+
+              <span th:if="${t.dueDate != null}"
+                    th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+              <span th:if="${t.dueDate == null}">Không có hạn</span>
+            </div>
+          </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(recentTasks)}">
+          <td colspan="5" class="text-center text-muted py-4">
+            <i class="ti ti-inbox" style="font-size:24px;"></i>
+            <div class="mt-1">Chưa có công việc nào</div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHART JS -->
+  <script th:inline="javascript">
+    window.addEventListener('load', () => {
+      const todo = /*[[${todoCount}]]*/ 0;
+      const prog = /*[[${inProgressCount}]]*/ 0;
+      const done = /*[[${doneCount}]]*/ 0;
+
+      const low  = /*[[${lowCount}]]*/ 0;
+      const med  = /*[[${mediumCount}]]*/ 0;
+      const high = /*[[${highCount}]]*/ 0;
+
+      const textColor = 'rgba(255,255,255,.72)';
+      const gridColor = 'rgba(255,255,255,.08)';
+
+      new Chart(document.getElementById('chartStatus'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Cần làm', 'Đang làm', 'Hoàn thành'],
+          datasets: [{
+            data: [todo, prog, done],
+            backgroundColor: ['#94a3b8', '#3b82f6', '#22c55e'],
+            borderColor: 'rgba(11,36,56,.95)',
+            borderWidth: 4,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: textColor,
+                usePointStyle: true,
+                padding: 16
+              }
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById('chartPriority'), {
+        type: 'bar',
+        data: {
+          labels: ['Thấp', 'Trung bình', 'Cao'],
+          datasets: [{
+            data: [low, med, high],
+            backgroundColor: ['#1fd1b9', '#fbbf24', '#fb7185'],
+            borderRadius: 10,
+            maxBarThickness: 60
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { display: false },
+              border: { color: gridColor }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: textColor, stepSize: 1 },
+              grid: { color: gridColor },
+              border: { color: gridColor }
+            }
+          }
+        }
+      });
+    });
+  </script>
+
+</section>
+</html>
