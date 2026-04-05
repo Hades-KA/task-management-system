@@ -34,7 +34,7 @@
                  th:value="${q}">
         </div>
 
-        <label class="form-check mb-0">
+        <label class="form-check mb-0 d-flex align-items-center gap-2">
           <input class="form-check-input" type="checkbox" name="overdue" value="true"
                  th:checked="${overdue}" onchange="this.form.submit()">
           <span class="form-check-label">Trễ hạn</span>
@@ -56,16 +56,19 @@
            th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue})}">
           Tất cả (<span th:text="${totalCount}">0</span>)
         </a>
+
         <a class="btn btn-sm"
            th:classappend="${selectedStatus != null and selectedStatus.name() == 'TODO'} ? 'btn-primary' : 'btn-outline-light'"
            th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='TODO')}">
           Cần làm (<span th:text="${todoCount}">0</span>)
         </a>
+
         <a class="btn btn-sm"
            th:classappend="${selectedStatus != null and selectedStatus.name() == 'IN_PROGRESS'} ? 'btn-primary' : 'btn-outline-light'"
            th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='IN_PROGRESS')}">
           Đang làm (<span th:text="${inProgressCount}">0</span>)
         </a>
+
         <a class="btn btn-sm"
            th:classappend="${selectedStatus != null and selectedStatus.name() == 'DONE'} ? 'btn-primary' : 'btn-outline-light'"
            th:href="@{/ui/list(projectId=${selectedProjectId},priority=${selectedPriority},q=${q},overdue=${overdue},status='DONE')}">
@@ -83,44 +86,71 @@
         <tr>
           <th style="width:100px">ID</th>
           <th>Tiêu đề</th>
-          <th style="width:120px">Trạng thái</th>
-          <th style="width:110px">Mức độ</th>
-          <th style="width:120px">Hạn chót</th>
-          <th style="width:140px">Dự án</th>
-          <th style="width:80px" class="text-end">Sửa</th>
+          <th style="width:140px">Trạng thái</th>
+          <th style="width:120px">Mức độ</th>
+          <th style="width:140px">Hạn chót</th>
+          <th style="width:160px">Dự án</th>
+          <th style="width:90px" class="text-end">Sửa</th>
         </tr>
         </thead>
+
         <tbody>
         <tr th:each="t : ${tasks}">
+          <!-- ID -->
           <td class="text-muted" th:text="'TASK-' + ${t.id}">TASK-1</td>
+
+          <!-- Title -->
           <td>
             <div class="fw-semibold" th:text="${t.title}">Title</div>
-            <div class="text-muted small" th:if="${t.description != null and !t.description.isBlank()}"
-                 th:text="${#strings.abbreviate(t.description, 60)}">Desc</div>
+            <div class="text-muted small"
+                 th:if="${t.description != null and !t.description.isBlank()}"
+                 th:text="${#strings.abbreviate(t.description, 70)}">
+              Desc
+            </div>
           </td>
+
+          <!-- Status -->
           <td>
             <span class="badge" th:classappend="${t.status.badgeClass}">
               <i th:class="'me-1 ' + ${t.status.iconClass}"></i>
               <span th:text="${t.status.label}">Status</span>
             </span>
           </td>
+
+          <!-- Priority -->
           <td>
             <span class="badge"
                   th:classappend="${t.priority.name() == 'HIGH' ? 'bg-danger-lt text-danger' : (t.priority.name() == 'MEDIUM' ? 'bg-warning-lt text-warning' : 'bg-teal-lt text-teal')}"
-                  th:text="${t.priority.label}">Priority</span>
-          </td>
-          <td>
-            <span th:if="${t.dueDate != null}" th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
-            <span th:if="${t.dueDate == null}" class="text-muted">-</span>
-            <span class="badge bg-danger ms-1"
-                  th:if="${t.dueDate != null and t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'}">
-              Trễ
+                  th:text="${t.priority.label}">
+              Priority
             </span>
           </td>
+
+          <!-- Deadline -->
+          <td>
+            <div class="d-flex flex-column align-items-start">
+              <span th:if="${t.dueDate != null}"
+                    th:text="${#temporals.format(t.dueDate, 'dd/MM/yyyy')}">01/01/2026</span>
+
+              <span th:if="${t.dueDate == null}" class="text-muted">-</span>
+
+              <span class="badge badge-overdue mt-1"
+                    th:if="${t.dueDate != null and t.dueDate.isBefore(T(java.time.LocalDate).now()) and t.status.name() != 'DONE'}">
+                Trễ hạn
+              </span>
+            </div>
+          </td>
+
+          <!-- Project -->
           <td>
             <a th:href="@{/projects/{id}(id=${t.project.id})}"
-               th:text="${t.project.name}" class="text-reset">Project</a>
+               th:text="${t.project.name}"
+               class="text-reset fw-semibold text-decoration-none">
+              Project
+            </a>
           </td>
+
+          <!-- Edit -->
           <td class="text-end">
             <a class="btn btn-sm btn-outline-primary"
                th:href="@{/tasks/{id}/edit(id=${t.id})}">
@@ -130,13 +160,15 @@
         </tr>
 
         <tr th:if="${#lists.isEmpty(tasks)}">
-          <td colspan="7" class="text-center text-muted py-4">Không tìm thấy công việc nào</td>
+          <td colspan="7" class="text-center text-muted py-4">
+            <i class="ti ti-search-off me-1"></i> Không tìm thấy công việc nào
+          </td>
         </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Phân trang -->
+    <!-- Pagination -->
     <div class="card-footer d-flex align-items-center justify-content-center gap-2"
          th:if="${totalPages > 0}">
 
@@ -164,7 +196,6 @@
       </button>
 
     </div>
-
   </div>
 
 </section>

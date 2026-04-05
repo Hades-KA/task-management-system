@@ -654,6 +654,33 @@ body.dark-dashboard .form-check-label{
   color: rgba(255,255,255,.78) !important;
 }
 
+/* ===== PROJECT DETAIL ===== */
+.project-member-badge{
+  padding: 6px 12px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+}
+
+.owner-badge{
+  background: rgba(31,209,185,.12);
+  color: #1fd1b9;
+  border: 1px solid rgba(31,209,185,.25);
+}
+
+.member-badge{
+  background: rgba(59,130,246,.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59,130,246,.25);
+}
+
+.project-member-remove{
+  font-size: 8px !important;
+  opacity: .6;
+}
+
 /* ===== PROJECT DETAIL TASK TABLE ===== */
 .project-task-table{
   width: 100%;
@@ -667,14 +694,14 @@ body.dark-dashboard .form-check-label{
 }
 
 .project-task-table .col-title{ width: 16%; }
-.project-task-table .col-desc{ width: 17%; }
+.project-task-table .col-desc{ width: 20%; }
 .project-task-table .col-type{ width: 8%; }
 .project-task-table .col-reporter{ width: 10%; }
 .project-task-table .col-assignee{ width: 10%; }
 .project-task-table .col-priority{ width: 8%; }
 .project-task-table .col-deadline{ width: 10%; }
-.project-task-table .col-status{ width: 12%; }
-.project-task-table .col-action{ width: 9%; }
+.project-task-table .col-status{ width: 10%; }
+.project-task-table .col-action{ width: 8%; }
 
 .project-task-table th{
   white-space: nowrap;
@@ -694,11 +721,15 @@ body.dark-dashboard .form-check-label{
 .task-desc-cell{
   line-height: 1.45;
   max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .project-status-select{
-  min-width: 110px;
-  max-width: 120px;
+  min-width: 105px;
+  max-width: 115px;
   height: 36px !important;
   font-size: 12px !important;
   padding: 6px 10px !important;
@@ -725,13 +756,167 @@ body.dark-dashboard .form-check-label{
   overflow-x: auto;
 }
 
-@media (max-width: 1400px){
-  .project-task-table{
-    min-width: 1200px;
-  }
+/* ===== AI PLANNER ===== */
+body.dark-dashboard .alert.alert-danger{
+  background: rgba(251,113,133,.12);
+  color: #fb7185;
+  border: 1px solid rgba(251,113,133,.25);
+}
+
+/* ===== AI PLANNER LAYOUT IMPROVE ===== */
+.ai-input-area{
+  min-height: 280px !important;
+}
+
+.ai-member-area{
+  min-height: 210px !important;
+}
+
+.ai-result-card .card-body{
+  padding-top: 18px;
+}
+
+.ai-summary-box{
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.ai-section-label{
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,.50);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  margin-bottom: 8px;
+}
+
+.ai-summary-text{
+  color: rgba(255,255,255,.90);
+  line-height: 1.7;
+  font-size: 14px;
+  white-space: pre-line;
+}
+
+.ai-plan-table-wrap{
+  overflow-x: auto;
+}
+
+.ai-plan-table{
+  width: 100%;
+  table-layout: fixed;
+}
+
+.ai-plan-table th,
+.ai-plan-table td{
+  padding: 14px 12px !important;
+  vertical-align: top !important;
+}
+
+.ai-plan-table .ai-col-title{ width: 45%; }
+.ai-plan-table .ai-col-type{ width: 10%; }
+.ai-plan-table .ai-col-priority{ width: 10%; }
+.ai-plan-table .ai-col-est{ width: 9%; }
+.ai-plan-table .ai-col-deadline{ width: 13%; }
+.ai-plan-table .ai-col-assignee{ width: 13%; }
+
+.ai-task-title{
+  color: rgba(255,255,255,.94);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.ai-task-desc{
+  color: rgba(255,255,255,.74) !important;
+  line-height: 1.55;
+  display: block;
+}
+
+.ai-reason-label{
+  color: #1fd1b9;
+  font-weight: 700;
+}
+
+.ai-type-badge,
+.ai-priority-badge{
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.ai-type-badge.feature{
+  color: #3b82f6;
+  background: rgba(59,130,246,.12);
+  border-color: rgba(59,130,246,.24);
+}
+
+.ai-type-badge.bug{
+  color: #fb7185;
+  background: rgba(251,113,133,.12);
+  border-color: rgba(251,113,133,.24);
+}
+
+.ai-type-badge.task{
+  color: #1fd1b9;
+  background: rgba(31,209,185,.12);
+  border-color: rgba(31,209,185,.24);
+}
+
+.ai-priority-badge.high{
+  color: #fb7185;
+  background: rgba(251,113,133,.12);
+  border-color: rgba(251,113,133,.24);
+}
+
+.ai-priority-badge.medium{
+  color: #fbbf24;
+  background: rgba(251,191,36,.12);
+  border-color: rgba(251,191,36,.24);
+}
+
+.ai-priority-badge.low{
+  color: #1fd1b9;
+  background: rgba(31,209,185,.12);
+  border-color: rgba(31,209,185,.24);
+}
+
+/* ===== LOADING OVERLAY ===== */
+.ai-loading-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 12, 20, .55);
+  backdrop-filter: blur(3px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-loading-box{
+  min-width: 300px;
+  max-width: 420px;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #0b2438, #0d2a41);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 20px 40px rgba(0,0,0,.35);
+  text-align: center;
+  color: rgba(255,255,255,.92);
 }
 
 /* ===== RESPONSIVE ===== */
+@media (max-width: 1400px){
+  .project-task-table{
+    min-width: 1180px;
+  }
+
+  .ai-plan-table{
+    min-width: 980px;
+  }
+}
+
 @media (max-width: 992px){
   .dash-hero-title{
     font-size: 24px;
@@ -748,5 +933,42 @@ body.dark-dashboard .form-check-label{
 
   body.dark-dashboard .page-title{
     font-size: 28px;
+  }
+
+  .ai-input-area{
+    min-height: 220px !important;
+  }
+
+  .ai-member-area{
+    min-height: 180px !important;
+  }
+}
+
+/* ===== OVERDUE BADGE IMPROVE ===== */
+.overdue-badge,
+body.dark-dashboard .badge.badge-overdue{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #ef4444, #fb7185) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: 0 6px 16px rgba(239,68,68,.22);
+}
+
+/* ===== DASHBOARD CHART IMPROVE ===== */
+.dash-chart-box{
+  height: 320px;
+  position: relative;
+}
+
+@media (max-width: 992px){
+  .dash-chart-box{
+    height: 260px;
   }
 }

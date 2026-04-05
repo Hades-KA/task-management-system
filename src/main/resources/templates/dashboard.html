@@ -251,8 +251,8 @@
       const high = /*[[${highCount}]]*/ 0;
 
       const textColor = 'rgba(255,255,255,.72)';
-      const gridColor = 'rgba(255,255,255,.08)';
 
+      // Doughnut chart
       new Chart(document.getElementById('chartStatus'), {
         type: 'doughnut',
         data: {
@@ -269,47 +269,127 @@
           responsive: true,
           maintainAspectRatio: false,
           cutout: '68%',
+          animation: {
+            duration: 900,
+            easing: 'easeOutQuart'
+          },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
                 color: textColor,
                 usePointStyle: true,
-                padding: 16
+                padding: 16,
+                font: {
+                  size: 13,
+                  weight: '600'
+                }
               }
+            },
+            tooltip: {
+              backgroundColor: '#0b2438',
+              titleColor: '#ffffff',
+              bodyColor: 'rgba(255,255,255,.88)',
+              borderColor: 'rgba(255,255,255,.08)',
+              borderWidth: 1,
+              padding: 12
             }
           }
         }
       });
 
+      // Bar chart đẹp hơn
       new Chart(document.getElementById('chartPriority'), {
         type: 'bar',
         data: {
           labels: ['Thấp', 'Trung bình', 'Cao'],
           datasets: [{
+            label: 'Số lượng công việc',
             data: [low, med, high],
-            backgroundColor: ['#1fd1b9', '#fbbf24', '#fb7185'],
-            borderRadius: 10,
-            maxBarThickness: 60
+            backgroundColor: [
+              'rgba(31,209,185,0.95)',
+              'rgba(251,191,36,0.95)',
+              'rgba(251,113,133,0.95)'
+            ],
+            borderColor: [
+              'rgba(31,209,185,1)',
+              'rgba(251,191,36,1)',
+              'rgba(251,113,133,1)'
+            ],
+            borderWidth: 1,
+            borderRadius: 14,
+            borderSkipped: false,
+            maxBarThickness: 56,
+            categoryPercentage: 0.62,
+            barPercentage: 0.72
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 900,
+            easing: 'easeOutQuart'
+          },
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0b2438',
+              titleColor: '#ffffff',
+              bodyColor: 'rgba(255,255,255,.88)',
+              borderColor: 'rgba(255,255,255,.08)',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return ' ' + context.parsed.y + ' công việc';
+                }
+              }
+            }
+          },
+          layout: {
+            padding: {
+              top: 8,
+              right: 6,
+              left: 6,
+              bottom: 0
+            }
           },
           scales: {
             x: {
-              ticks: { color: textColor },
-              grid: { display: false },
-              border: { color: gridColor }
+              ticks: {
+                color: 'rgba(255,255,255,.78)',
+                font: {
+                  size: 13,
+                  weight: '600'
+                }
+              },
+              grid: {
+                display: false,
+                drawBorder: false
+              },
+              border: {
+                display: false
+              }
             },
             y: {
               beginAtZero: true,
-              ticks: { color: textColor, stepSize: 1 },
-              grid: { color: gridColor },
-              border: { color: gridColor }
+              suggestedMax: Math.max(low, med, high) + 2,
+              ticks: {
+                color: 'rgba(255,255,255,.55)',
+                stepSize: 1,
+                font: {
+                  size: 12
+                }
+              },
+              grid: {
+                color: 'rgba(255,255,255,.06)',
+                drawBorder: false
+              },
+              border: {
+                display: false
+              }
             }
           }
         }
