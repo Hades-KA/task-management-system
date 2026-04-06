@@ -3,7 +3,7 @@
         xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <div class="container-xl">
 
-    <!-- Toggle sidebar button -->
+    <!-- Toggle sidebar -->
     <button class="navbar-toggler border-0 me-2" type="button" onclick="toggleSidebar()" title="Ẩn/hiện sidebar">
       <i class="ti ti-layout-sidebar-left-collapse" style="font-size:20px;"></i>
     </button>
@@ -27,6 +27,12 @@
         </form>
       </div>
 
+      <!-- Theme toggle -->
+      <button class="btn btn-ghost" type="button" onclick="toggleTheme()" title="Đổi giao diện sáng/tối">
+        <i id="themeToggleIcon" class="ti ti-sun"></i>
+        <span id="themeToggleLabel" class="ms-1 d-none d-md-inline">Light</span>
+      </button>
+
       <!-- Create button -->
       <a class="btn btn-primary" th:href="@{/projects/new}">
         <i class="ti ti-plus me-1"></i> Tạo Mới
@@ -45,8 +51,12 @@
           </div>
         </a>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-          <a class="dropdown-item" th:href="@{/dashboard}"><i class="ti ti-layout-dashboard me-2"></i>Dashboard</a>
-          <a class="dropdown-item" th:href="@{/projects}"><i class="ti ti-folder me-2"></i>Projects</a>
+          <a class="dropdown-item" th:href="@{/dashboard}">
+            <i class="ti ti-layout-dashboard me-2"></i>Dashboard
+          </a>
+          <a class="dropdown-item" th:href="@{/projects}">
+            <i class="ti ti-folder me-2"></i>Projects
+          </a>
           <div class="dropdown-divider"></div>
           <form th:action="@{/logout}" method="post" class="px-2">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>

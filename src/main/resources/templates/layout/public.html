@@ -3,26 +3,34 @@
       th:fragment="layout(content, pageTitle)">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title th:text="${pageTitle}">QLCV</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/public-auth.css}">
 </head>
-<body class="bg-surface">
+
+<body class="public-auth">
 
 <div th:replace="~{fragments/navbar_public :: navbar}"></div>
 
 <div class="page-wrapper">
   <div class="page-body">
-    <div class="container-xl">
+    <div class="container-fluid px-4 px-lg-5">
       <div th:replace="${content}"></div>
     </div>
   </div>
+
   <footer class="footer footer-transparent d-print-none mt-4">
-    <div class="container-xl">
-      <div th:replace="~{fragments/footer :: footer}"></div>
+    <div class="container-fluid px-4 px-lg-5">
+      <div class="small public-footer text-center py-3">
+        © 2026 - QLCV | J2EE Final Project
+      </div>
     </div>
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/js/tabler.min.js"></script>
 </body>
 </html>

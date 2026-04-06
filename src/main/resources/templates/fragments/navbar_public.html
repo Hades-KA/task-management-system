@@ -1,7 +1,11 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark" th:fragment="navbar"
+<nav class="navbar navbar-expand-md public-nav" th:fragment="navbar"
      xmlns:th="http://www.thymeleaf.org">
-  <div class="container-xl">
-    <a class="navbar-brand" th:href="@{/}">QLCV</a>
+  <div class="container-fluid px-4 px-lg-5">
+    <a class="navbar-brand" th:href="@{/}">
+      <i class="ti ti-checkup-list me-2" style="font-size:20px; color:#1fd1b9;"></i>
+      QLCV
+    </a>
+
     <div class="navbar-nav ms-auto">
       <a class="nav-link" th:href="@{/login}">Đăng nhập</a>
       <a class="nav-link" th:href="@{/register}">Đăng ký</a>

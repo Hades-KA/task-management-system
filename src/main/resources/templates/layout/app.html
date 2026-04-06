@@ -9,10 +9,8 @@
 
   <title th:text="${pageTitle}">QLCV</title>
 
-  <!-- Tabler UI -->
+  <!-- Tabler UI + Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/css/tabler.min.css">
-
-  <!-- Tabler Icons - THỬ NHIỀU LINK -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 
   <!-- Custom CSS -->
@@ -28,19 +26,22 @@
       padding: 0;
       border: 0;
     }
+
     .page.sidebar-collapsed .page-wrapper {
       margin-left: 0 !important;
     }
+
     aside.navbar-vertical {
       transition: width .25s ease, min-width .25s ease;
     }
+
     .page-wrapper {
       transition: margin-left .25s ease;
     }
   </style>
 </head>
 
-<body class="layout-fluid dark-dashboard">
+<body class="layout-fluid dark-dashboard" id="appBody">
 
 <!-- Topbar -->
 <div th:replace="~{fragments/navbar_app :: navbar}"></div>
@@ -78,22 +79,54 @@
 <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta21/dist/js/tabler.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<!-- Sidebar toggle script -->
 <script>
   (function() {
-    const KEY = 'sidebar-collapsed';
-    const page = document.getElementById('pageRoot');
+    const sidebarKey = 'sidebar-collapsed';
+    const themeKey = 'app-theme';
 
-    // Restore state
-    if (localStorage.getItem(KEY) === 'true') {
+    const page = document.getElementById('pageRoot');
+    const body = document.getElementById('appBody');
+
+    // ===== Restore sidebar state =====
+    if (localStorage.getItem(sidebarKey) === 'true') {
       page.classList.add('sidebar-collapsed');
     }
 
-    // Toggle function (gọi từ navbar)
+    // ===== Restore theme =====
+    const savedTheme = localStorage.getItem(themeKey) || 'dark';
+    applyTheme(savedTheme);
+
+    // Toggle sidebar
     window.toggleSidebar = function() {
       page.classList.toggle('sidebar-collapsed');
-      localStorage.setItem(KEY, page.classList.contains('sidebar-collapsed'));
+      localStorage.setItem(sidebarKey, page.classList.contains('sidebar-collapsed'));
     };
+
+    // Toggle theme
+    window.toggleTheme = function() {
+      const current = body.classList.contains('light-dashboard') ? 'light' : 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem(themeKey, next);
+    };
+
+    function applyTheme(theme) {
+      body.classList.remove('dark-dashboard', 'light-dashboard');
+      body.classList.add(theme === 'light' ? 'light-dashboard' : 'dark-dashboard');
+
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+
+      if (icon && label) {
+        if (theme === 'light') {
+          icon.className = 'ti ti-moon';
+          label.innerText = 'Dark';
+        } else {
+          icon.className = 'ti ti-sun';
+          label.innerText = 'Light';
+        }
+      }
+    }
   })();
 </script>
 
